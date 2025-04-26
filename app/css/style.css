@@ -7,29 +7,21 @@ body {
   align-items: center;
   justify-content: center;
   height: 100vh;
+  font-family: monospace;
 }
 
 #diamond-container {
   position: absolute;
   top: 50%;
   left: 0;
-  transform: translateY(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  transition: transform .05s linear;
+  transform: translate(0, -50%);
+  transition: transform 0.05s linear;
 }
 
-.row {
-  display: flex;
-  justify-content: center;
-  height: 24px;
-}
-
-.block {
-  width: 20px;
-  height: 20px;
-  margin: 2px;
-  background-color: #3498db;
-  border-radius: 4px;
+.text-row {
+  font-family: monospace;
+  font-size: 20px;
+  line-height: 1.2;
+  white-space: pre; /* Preserve spacing */
+  text-align: left; /* Force consistent alignment */
 }

@@ -1,54 +1,70 @@
 "use strict";
 
-var container = document.getElementById(`diamond-container`);
-var createDiamond = function createDiamond(size) {
+const container = document.getElementById(`diamond-container`);
+
+const createDiamond = (size) => {
     container.innerHTML = ``;
-    var midpoint = Math.floor(size / 2);
-    for (var i = 0; i < size; i++) {
-        var row = document.createElement(`div`);
-        row.classList.add(`row`);
-        var distanceFromCenter = Math.abs(midpoint - i);
-        var blocksInRow = size - 2 * distanceFromCenter;
-        for (var j = 0; j < blocksInRow; j++) {
-            var block = document.createElement(`div`);
-            block.classList.add(`block`);
-            row.appendChild(block);
-        }
-        container.appendChild(row);
+
+    const midpoint = Math.floor(size / 2);
+
+    for (let i = 0; i < size; i++) {
+      const row = document.createElement(`div`);
+      row.classList.add(`text-row`);
+
+      const distance = Math.abs(midpoint - i);
+      const starsCount = size - 2 * distance;
+
+      if (starsCount <= 0) continue; // skip invalid rows for even sizes
+
+      const stars = (`* `).repeat(starsCount).trim();
+      const totalChars = size * 2 - 1;
+      const rowChars = stars.length;
+      const paddingSize = Math.floor((totalChars - rowChars) / 2);
+      const padding = `\u00A0`.repeat(paddingSize);
+
+      row.textContent = `${padding}${stars}`;
+      container.appendChild(row);
     }
-};
-var slideDiamond = function slideDiamond() {
-    var direction = 1;
-    var position = 0;
-    var _updateSlide = function updateSlide() {
-        var containerWidth = container.offsetWidth;
-        var viewportWidth = window.innerWidth;
-        var maxOffset = viewportWidth - containerWidth;
-        if (position >= maxOffset || position <= 0) {
-            direction *= -1;
-        }
-        position += direction * 2;
-        container.style.transform = `translateX(`.concat(position, `px)`);
-        requestAnimationFrame(_updateSlide);
-    };
-    _updateSlide();
-};
-var promptAndStart = function promptAndStart() {
-    var size = parseInt(prompt(`Enter diamond size (odd or even number >= 3):`), 10);
-    if (isNaN(size) || size < 3) {
-        alert(`Please enter a valid number >= 3`);
-        return;
+  };
+
+
+const slideDiamond = () => {
+  let direction = 1;
+  let position = 0;
+
+  const updateSlide = () => {
+    const containerWidth = container.offsetWidth;
+    const viewportWidth = window.innerWidth;
+    const maxOffset = viewportWidth - containerWidth;
+
+    if (position >= maxOffset || position <= 0) {
+      direction *= -1;
     }
-    if (size % 2 === 0) {
-    // Even size is valid, no center duplication
-    }
-    createDiamond(size);
-    slideDiamond();
+
+    position += direction * 2;
+    container.style.transform = `translate(${position}px, -50%)`;
+    requestAnimationFrame(updateSlide);
+  };
+
+  updateSlide();
 };
-window.addEventListener(`load`, function () {
-    promptAndStart();
+
+const promptAndStart = () => {
+  const size = parseInt(prompt(`Enter the size of your diamond as a number:`), 10);
+
+  if (Number.isNaN(size) || size <= 0) {
+    alert(`Please enter a valid number greater than 0`);
+    return;
+  }
+
+  createDiamond(size);
+  slideDiamond();
+};
+
+window.addEventListener(`load`, () => {
+  promptAndStart();
 });
-window.addEventListener(`resize`, function () {
-    container.style.transform = `translateX(0px)`;
+
+window.addEventListener(`resize`, () => {
+  container.style.transform = `translate(0px, -50%)`;
 });
-//# sourceMappingURL=app.js.map
