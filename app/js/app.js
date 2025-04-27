@@ -1,58 +1,92 @@
 "use strict";
 
-const container = document.getElementById(`diamond-container`);
+const container = document.getElementById('diamond-container');
 
 const createDiamond = (size) => {
-    container.innerHTML = ``;
+  container.innerHTML = ``;
 
-    const midpoint = Math.floor(size / 2);
+  const isEven = size % 2 === 0;
+  const totalRows = isEven ? size + 1 : size;
+  const middleRow = Math.floor(totalRows / 2);
 
-    for (let i = 0; i < size; i++) {
-      const row = document.createElement(`div`);
-      row.classList.add(`text-row`);
+  for (let i = 0; i < totalRows; i++) {
+    const row = document.createElement(`div`);
+    row.classList.add(`row`);
 
-      const distance = Math.abs(midpoint - i);
-      const starsCount = size - 2 * distance;
+    const distanceFromMiddle = Math.abs(middleRow - i);
 
-      if (starsCount <= 0) continue; // skip invalid rows for even sizes
-
-      const stars = (`* `).repeat(starsCount).trim();
-      const totalChars = size * 2 - 1;
-      const rowChars = stars.length;
-      const paddingSize = Math.floor((totalChars - rowChars) / 2);
-      const padding = `\u00A0`.repeat(paddingSize);
-
-      row.textContent = `${padding}${stars}`;
-      container.appendChild(row);
+    let starsInRow;
+    if (isEven) {
+      if (distanceFromMiddle === middleRow) {
+        starsInRow = 1;
+      } else {
+        starsInRow = size - distanceFromMiddle * 2;
+      }
+    } else {
+      starsInRow = size - distanceFromMiddle * 2;
     }
-  };
 
+    const spaces = middleRow - Math.floor(starsInRow / 2);
+
+    for (let s = 0; s < spaces; s++) {
+      const space = document.createElement(`span`);
+      space.classList.add(`space`);
+      row.appendChild(space);
+    }
+
+    for (let j = 0; j < starsInRow; j++) {
+      const star = document.createElement(`span`);
+      star.classList.add(`star`);
+      star.textContent = `*`;
+      row.appendChild(star);
+
+      if (j !== starsInRow - 1) {
+        const innerSpace = document.createElement(`span`);
+        innerSpace.classList.add(`space`);
+        row.appendChild(innerSpace);
+      }
+    }
+
+    for (let s = 0; s < spaces; s++) {
+      const space = document.createElement(`span`);
+      space.classList.add(`space`);
+      row.appendChild(space);
+    }
+
+    container.appendChild(row);
+  }
+};
 
 const slideDiamond = () => {
-  let direction = 1;
-  let position = 0;
+    let direction = 1;
+    let position = 0;
 
-  const updateSlide = () => {
-    const containerWidth = container.offsetWidth;
-    const viewportWidth = window.innerWidth;
-    const maxOffset = viewportWidth - containerWidth;
+    const updateSlide = () => {
+      const containerWidth = container.offsetWidth;
+      const viewportWidth = window.innerWidth;
+      const maxOffset = viewportWidth - containerWidth;
 
-    if (position >= maxOffset || position <= 0) {
-      direction *= -1;
-    }
+      if (position >= maxOffset) {
+        position = maxOffset;
+        direction = -1;
+      } else if (position <= 0) {
+        position = 0;
+        direction = 1;
+      }
 
-    position += direction * 2;
-    container.style.transform = `translate(${position}px, -50%)`;
-    requestAnimationFrame(updateSlide);
+      position += direction * 2;
+      container.style.left = `${position}px`;
+
+      requestAnimationFrame(updateSlide);
+    };
+
+    updateSlide();
   };
-
-  updateSlide();
-};
 
 const promptAndStart = () => {
   const size = parseInt(prompt(`Enter the size of your diamond as a number:`), 10);
 
-  if (Number.isNaN(size) || size <= 0) {
+  if (isNaN(size) || size < 1) {
     alert(`Please enter a valid number greater than 0`);
     return;
   }
@@ -61,10 +95,10 @@ const promptAndStart = () => {
   slideDiamond();
 };
 
-window.addEventListener(`load`, () => {
+window.addEventListener('load', () => {
   promptAndStart();
 });
 
-window.addEventListener(`resize`, () => {
-  container.style.transform = `translate(0px, -50%)`;
+window.addEventListener('resize', () => {
+  container.style.left = `0px`;
 });

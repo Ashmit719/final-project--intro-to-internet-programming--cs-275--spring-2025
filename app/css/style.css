@@ -3,25 +3,37 @@ body {
   padding: 0;
   overflow: hidden;
   background-color: #f0f0f0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
   font-family: monospace;
 }
 
 #diamond-container {
   position: absolute;
-  top: 50%;
+  top: 0;
   left: 0;
-  transform: translate(0, -50%);
-  transition: transform 0.05s linear;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  border: 1px solid #000508;
+  background-color: white;
 }
 
-.text-row {
-  font-family: monospace;
+
+.row {
+  display: flex;
+  justify-content: center;
+  height: 24px;
+}
+
+.space {
+  display: inline-block;
+  width: 1px;
+}
+
+.star {
+  display: inline-block;
+  width: 20px;
+  text-align: center;
   font-size: 20px;
-  line-height: 1.2;
-  white-space: pre; /* Preserve spacing */
-  text-align: left; /* Force consistent alignment */
+  color: #3498db;
 }
