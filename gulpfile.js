@@ -1,6 +1,7 @@
 "use strict";
 const { src, dest, series, parallel, watch } = require(`gulp`);
 const CSSLinter = require(`gulp-stylelint`);
+const htmlValidator = require(`gulp-html-validator`);
 const { deleteAsync } = require(`del`);
 const babel = require(`gulp-babel`);
 const htmlMin = require(`gulp-htmlmin`);
@@ -17,10 +18,16 @@ const clean = async () => {
     console.log(`Deleted folders:`, foldersToDelete);
 };
 
+// Validate HTML
+const validateHTML = () => {
+    return src(`app/html/**/*.html`)
+        .pipe(htmlValidator({ verbose: true }));
+};
+
 // Copy HTML to dev
 const copyHTMLToDev = () => {
     return src(`app/html/**/*.html`)
-        .pipe(dest(`dev`));
+        .pipe(dest(`dev/html`));
 };
 
 // Copy CSS to dev
@@ -46,29 +53,29 @@ const validateCSS = () => {
         }));
 };
 
-// Lint JS
-const lintJS = () => {
+// Validate JS
+const validateJS = () => {
     return src(`app/js/**/*.js`)
         .pipe(eslint())
         .pipe(eslint.formatEach(`compact`));
 };
 
-// Minify HTML to prod
-const minifyHTML = () => {
+// Compress HTML to prod
+const compressHTML = () => {
     return src(`app/html/**/*.html`)
         .pipe(htmlMin({ collapseWhitespace: true }))
         .pipe(dest(`prod`));
 };
 
-// Minify CSS to prod
-const minifyCSS = () => {
+// Compress CSS to prod
+const compressCSS = () => {
     return src(`app/css/**/*.css`)
         .pipe(postcss([cssnano()]))
         .pipe(dest(`prod/css`));
 };
 
-// Transpile and Minify JS to prod
-const transpileAndMinifyJS = () => {
+// Transpile and Compress JS to prod
+const transpileAndCompressJS = () => {
     return src(`app/js/**/*.js`)
         .pipe(plumber()) // handle errors
         .pipe(babel({ presets: [`@babel/preset-env`] }))
@@ -76,36 +83,37 @@ const transpileAndMinifyJS = () => {
         .pipe(dest(`prod/js`)); // Output to prod/js folder
 };
 
-// Ensure the `js` folder is created in `dev` and `prod`
-const ensureJSFolderExists = () => {
-    return src(`app/js/**/*`)
-        .pipe(dest(`dev/js`))  // Ensure dev/js folder is created
-        .pipe(dest(`prod/js`)); // Ensure prod/js folder is created
-};
 
-// Serve from 'dev'
 const serve = () => {
     browserSync.init({
         notify: true,
-        server: { baseDir: `dev` }
+        server: {
+            baseDir: [
+                `dev`,        // Serve from the root 'dev' folder
+                `dev/html`,   // Serve HTML from 'dev/html'
+                `dev/css`,    // Serve CSS from 'dev/css'
+                `dev/js`      // Serve JS from 'dev/js'
+            ]
+        }
     });
 
+    // Watch for changes and reload
     watch(`app/html/**/*.html`, series(copyHTMLToDev))
         .on(`change`, browserSync.reload);
-    watch(`app/css/**/*.css`,
-        series(validateCSS, copyCSSToDev)
-    ).on(`change`, browserSync.reload);
-    watch(`app/js/**/*.js`,
-        series(lintJS, transpileJSToDev)
-    ).on(`change`, browserSync.reload);
+
+    watch(`app/css/**/*.css`, series(validateCSS, copyCSSToDev))
+        .on(`change`, browserSync.reload);
+
+    watch(`app/js/**/*.js`, series(validateJS, transpileJSToDev))
+        .on(`change`, browserSync.reload);
 };
 
 // Development Task
 const dev = series(
     clean,
     validateCSS,
-    lintJS,
-    ensureJSFolderExists, // Ensure the js folders are created
+    validateHTML,
+    validateJS,
     parallel(copyHTMLToDev, copyCSSToDev, transpileJSToDev),
     serve
 );
@@ -114,9 +122,9 @@ const dev = series(
 const build = series(
     clean,
     validateCSS,
-    lintJS,
-    ensureJSFolderExists, // Ensure the js folders are created
-    parallel(minifyHTML, minifyCSS, transpileAndMinifyJS)
+    validateHTML,
+    validateJS,
+    parallel(compressHTML, compressCSS, transpileAndCompressJS)
 );
 
 // Export Tasks
