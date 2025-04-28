@@ -1,4 +1,5 @@
 "use strict";
+
 const { src, dest, series, parallel, watch } = require(`gulp`);
 const CSSLinter = require(`gulp-stylelint`);
 const htmlValidator = require(`gulp-html-validator`);
@@ -10,7 +11,7 @@ const eslint = require(`gulp-eslint`);
 const cssnano = require(`cssnano`);
 const postcss = require(`gulp-postcss`);
 const browserSync = require(`browser-sync`).create();
-const plumber = require(`gulp-plumber`); // to avoid pipe breaking on errors
+const plumber = require(`gulp-plumber`);
 
 // Clean 'dev' and 'prod' folders
 const clean = async () => {
@@ -43,7 +44,7 @@ const validateJS = () => {
 // Copy HTML to dev
 const copyHTMLToDev = () => {
     return src(`app/html/**/*.html`)
-        .pipe(dest(`dev/html`));//Output to dev/html folder
+        .pipe(dest(`dev/html`));
 };
 
 // Copy CSS to dev
@@ -52,82 +53,89 @@ const copyCSSToDev = () => {
         .pipe(dest(`dev/css`));
 };
 
-// Transpile JS to dev (no minification)
-const transpileJSToDev = () => {
+// Transpile JS for development (only Babel, no minification)
+const transpileJSForDev = () => {
     return src(`app/js/**/*.js`)
-        .pipe(plumber()) // handle errors gracefully
+        .pipe(plumber())
         .pipe(babel({ presets: [`@babel/preset-env`] }))
-        .pipe(dest(`dev/js`)); // Output to dev/js folder
+        .pipe(dest(`dev/js`));
 };
 
-
-// Compress HTML to prod
+// Compress HTML for production
 const compressHTML = () => {
     return src(`app/html/**/*.html`)
         .pipe(htmlMin({ collapseWhitespace: true }))
-        .pipe(dest(`prod`));    // Output to prod folder and not prod/html
+        .pipe(dest(`prod`)); // direct to prod (no subfolder)
 };
 
-// Compress CSS to prod
+// Compress CSS for production
 const compressCSS = () => {
     return src(`app/css/**/*.css`)
         .pipe(postcss([cssnano()]))
         .pipe(dest(`prod/css`));
 };
 
-// Transpile and Compress JS to prod
-const transpileAndCompressJS = () => {
+// Transpile JS for production (Babel only, no compression yet)
+const transpileJSForProd = () => {
     return src(`app/js/**/*.js`)
-        .pipe(plumber()) // handle errors
+        .pipe(plumber())
         .pipe(babel({ presets: [`@babel/preset-env`] }))
-        .pipe(uglify())
-        .pipe(dest(`prod/js`)); // Output to prod/js folder
+        .pipe(dest(`prod/js`));
 };
 
+// Compress already transpiled JS for production
+const compressJS = () => {
+    return src(`prod/js/**/*.js`)
+        .pipe(uglify())
+        .pipe(dest(`prod/js`));
+};
 
+// BrowserSync development server
 const serve = () => {
     browserSync.init({
         notify: true,
         server: {
             baseDir: [
-                `dev`,        // Serve from the root 'dev' folder
-                `dev/html`,   // Serve HTML from 'dev/html'
-                `dev/css`,    // Serve CSS from 'dev/css'
-                `dev/js`      // Serve JS from 'dev/js'
+                `dev`,
+                `dev/html`,
+                `dev/css`,
+                `dev/js`
             ]
         }
     });
 
-    // Watch for changes and reload
-    watch(`app/html/**/*.html`, series(copyHTMLToDev))
+    watch(`app/html/**/*.html`, series(validateHTML, copyHTMLToDev))
         .on(`change`, browserSync.reload);
 
     watch(`app/css/**/*.css`, series(validateCSS, copyCSSToDev))
         .on(`change`, browserSync.reload);
 
-    watch(`app/js/**/*.js`, series(validateJS, transpileJSToDev))
+    watch(`app/js/**/*.js`, series(validateJS, transpileJSForDev))
         .on(`change`, browserSync.reload);
 };
 
-// Development Task
+// Development workflow (gulp)
 const dev = series(
     clean,
-    validateCSS,
-    validateHTML,
-    validateJS,
-    parallel(copyHTMLToDev, copyCSSToDev, transpileJSToDev),
+    parallel(validateHTML, validateCSS, validateJS),
+    parallel(copyHTMLToDev, copyCSSToDev, transpileJSForDev),
     serve
 );
 
-// Production Build Task
+// Production workflow (gulp build)
 const build = series(
     clean,
-    validateCSS,
-    validateHTML,
-    validateJS,
-    parallel(compressHTML, compressCSS, transpileAndCompressJS)
+    parallel(compressHTML, compressCSS, series(transpileJSForProd, compressJS))
 );
 
-// Export Tasks
+// Export tasks
+exports.validateHTML = validateHTML;
+exports.validateCSS = validateCSS;
+exports.validateJS = validateJS;
+exports.compressHTML = compressHTML;
+exports.compressCSS = compressCSS;
+exports.compressJS = compressJS;
+exports.transpileJSForDev = transpileJSForDev;
+exports.transpileJSForProd = transpileJSForProd;
 exports.default = dev;
 exports.build = build;
