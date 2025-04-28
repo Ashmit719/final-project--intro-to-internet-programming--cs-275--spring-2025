@@ -27,7 +27,7 @@ body {
 
 .space {
   display: inline-block;
-  width: 1px;
+  width: .1px;
 }
 
 .star {

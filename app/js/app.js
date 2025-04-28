@@ -61,27 +61,31 @@ const slideDiamond = () => {
     let direction = 1;
     let position = 0;
 
-    const updateSlide = () => {
+    // Function to calculate maxOffset and containerWidth
+    const calculateOffsets = () => {
       const containerWidth = container.offsetWidth;
       const viewportWidth = window.innerWidth;
-      const maxOffset = viewportWidth - containerWidth;
+      return viewportWidth - containerWidth;
+    };
+
+    // Initial maxOffset
+    let maxOffset = calculateOffsets();
+
+    // Set interval to update position every 20 milliseconds (adjust as needed for speed)
+    const intervalId = setInterval(() => {
+      maxOffset = calculateOffsets(); // Recalculate maxOffset on each interval to handle window resize
 
       if (position >= maxOffset) {
-        position = maxOffset;
         direction = -1;
       } else if (position <= 0) {
-        position = 0;
         direction = 1;
       }
 
       position += direction * 2;
       container.style.left = `${position}px`;
+    }, 5); // milliseconds(can adjust for speed)
 
-      requestAnimationFrame(updateSlide);
-    };
-
-    updateSlide();
-  };
+};
 
 const promptAndStart = () => {
   const size = parseInt(prompt(`Enter the size of your diamond as a number:`), 10);
@@ -95,10 +99,5 @@ const promptAndStart = () => {
   slideDiamond();
 };
 
-window.addEventListener('load', () => {
-  promptAndStart();
-});
-
-window.addEventListener('resize', () => {
-  container.style.left = `0px`;
-});
+// Run the promptAndStart function directly
+promptAndStart();
