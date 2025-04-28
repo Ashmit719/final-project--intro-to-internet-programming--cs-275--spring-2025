@@ -24,26 +24,6 @@ const validateHTML = () => {
         .pipe(htmlValidator({ verbose: true }));
 };
 
-// Copy HTML to dev
-const copyHTMLToDev = () => {
-    return src(`app/html/**/*.html`)
-        .pipe(dest(`dev/html`));
-};
-
-// Copy CSS to dev
-const copyCSSToDev = () => {
-    return src(`app/css/**/*.css`)
-        .pipe(dest(`dev/css`));
-};
-
-// Transpile JS to dev (no minification)
-const transpileJSToDev = () => {
-    return src(`app/js/**/*.js`)
-        .pipe(plumber()) // handle errors gracefully
-        .pipe(babel({ presets: [`@babel/preset-env`] }))
-        .pipe(dest(`dev/js`)); // Output to dev/js folder
-};
-
 // Validate CSS
 const validateCSS = () => {
     return src(`app/css/**/*.css`)
@@ -60,11 +40,32 @@ const validateJS = () => {
         .pipe(eslint.formatEach(`compact`));
 };
 
+// Copy HTML to dev
+const copyHTMLToDev = () => {
+    return src(`app/html/**/*.html`)
+        .pipe(dest(`dev/html`));//Output to dev/html folder
+};
+
+// Copy CSS to dev
+const copyCSSToDev = () => {
+    return src(`app/css/**/*.css`)
+        .pipe(dest(`dev/css`));
+};
+
+// Transpile JS to dev (no minification)
+const transpileJSToDev = () => {
+    return src(`app/js/**/*.js`)
+        .pipe(plumber()) // handle errors gracefully
+        .pipe(babel({ presets: [`@babel/preset-env`] }))
+        .pipe(dest(`dev/js`)); // Output to dev/js folder
+};
+
+
 // Compress HTML to prod
 const compressHTML = () => {
     return src(`app/html/**/*.html`)
         .pipe(htmlMin({ collapseWhitespace: true }))
-        .pipe(dest(`prod`));
+        .pipe(dest(`prod`));    // Output to prod folder and not prod/html
 };
 
 // Compress CSS to prod
