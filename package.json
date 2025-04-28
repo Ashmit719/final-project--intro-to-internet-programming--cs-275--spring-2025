@@ -1,0 +1,18 @@
+{
+  "devDependencies": {
+    "browser-sync": "^3.0.4",
+    "cssnano": "^7.0.6",
+    "del": "^8.0.0",
+    "eslint": "^8.0.0",
+    "gulp": "^5.0.0",
+    "gulp-babel": "^8.0.0",
+    "gulp-eslint": "^6.0.0",
+    "gulp-htmlmin": "^5.0.1",
+    "gulp-plumber": "^1.2.1",
+    "gulp-postcss": "^10.0.0",
+    "gulp-stylelint": "^13.0.0",
+    "gulp-uglify": "^3.0.2",
+    "postcss": "^8.5.3",
+    "stylelint": "^13.13.1"
+  }
+}

@@ -1,60 +1,60 @@
 "use strict";
 
-const container = document.getElementById('diamond-container');
+const container = document.getElementById(`diamond-container`);
 
 const createDiamond = (size) => {
-  container.innerHTML = ``;
+    container.innerHTML = ``;
 
-  const isEven = size % 2 === 0;
-  const totalRows = isEven ? size + 1 : size;
-  const middleRow = Math.floor(totalRows / 2);
+    const isEven = size % 2 === 0;
+    const totalRows = isEven ? size + 1 : size;
+    const middleRow = Math.floor(totalRows / 2);
 
-  for (let i = 0; i < totalRows; i++) {
-    const row = document.createElement(`div`);
-    row.classList.add(`row`);
+    for (let i = 0; i < totalRows; i++) {
+        const row = document.createElement(`div`);
+        row.classList.add(`row`);
 
-    const distanceFromMiddle = Math.abs(middleRow - i);
+        const distanceFromMiddle = Math.abs(middleRow - i);
 
-    let starsInRow;
-    if (isEven) {
-      if (distanceFromMiddle === middleRow) {
-        starsInRow = 1;
-      } else {
-        starsInRow = size - distanceFromMiddle * 2;
-      }
-    } else {
-      starsInRow = size - distanceFromMiddle * 2;
+        let starsInRow;
+        if (isEven) {
+            if (distanceFromMiddle === middleRow) {
+                starsInRow = 1;
+            } else {
+                starsInRow = size - distanceFromMiddle * 2;
+            }
+        } else {
+            starsInRow = size - distanceFromMiddle * 2;
+        }
+
+        const spaces = middleRow - Math.floor(starsInRow / 2);
+
+        for (let s = 0; s < spaces; s++) {
+            const space = document.createElement(`span`);
+            space.classList.add(`space`);
+            row.appendChild(space);
+        }
+
+        for (let j = 0; j < starsInRow; j++) {
+            const star = document.createElement(`span`);
+            star.classList.add(`star`);
+            star.textContent = `*`;
+            row.appendChild(star);
+
+            if (j !== starsInRow - 1) {
+                const innerSpace = document.createElement(`span`);
+                innerSpace.classList.add(`space`);
+                row.appendChild(innerSpace);
+            }
+        }
+
+        for (let s = 0; s < spaces; s++) {
+            const space = document.createElement(`span`);
+            space.classList.add(`space`);
+            row.appendChild(space);
+        }
+
+        container.appendChild(row);
     }
-
-    const spaces = middleRow - Math.floor(starsInRow / 2);
-
-    for (let s = 0; s < spaces; s++) {
-      const space = document.createElement(`span`);
-      space.classList.add(`space`);
-      row.appendChild(space);
-    }
-
-    for (let j = 0; j < starsInRow; j++) {
-      const star = document.createElement(`span`);
-      star.classList.add(`star`);
-      star.textContent = `*`;
-      row.appendChild(star);
-
-      if (j !== starsInRow - 1) {
-        const innerSpace = document.createElement(`span`);
-        innerSpace.classList.add(`space`);
-        row.appendChild(innerSpace);
-      }
-    }
-
-    for (let s = 0; s < spaces; s++) {
-      const space = document.createElement(`span`);
-      space.classList.add(`space`);
-      row.appendChild(space);
-    }
-
-    container.appendChild(row);
-  }
 };
 
 const slideDiamond = () => {
@@ -63,40 +63,39 @@ const slideDiamond = () => {
 
     // Function to calculate maxOffset and containerWidth
     const calculateOffsets = () => {
-      const containerWidth = container.offsetWidth;
-      const viewportWidth = window.innerWidth;
-      return viewportWidth - containerWidth;
+        const containerWidth = container.offsetWidth;
+        const viewportWidth = window.innerWidth;
+        return viewportWidth - containerWidth;
     };
 
     // Initial maxOffset
     let maxOffset = calculateOffsets();
 
-    // Set interval to update position every 20 milliseconds (adjust as needed for speed)
-    const intervalId = setInterval(() => {
-      maxOffset = calculateOffsets(); // Recalculate maxOffset on each interval to handle window resize
 
-      if (position >= maxOffset) {
-        direction = -1;
-      } else if (position <= 0) {
-        direction = 1;
-      }
+    setInterval(() => {
+        maxOffset = calculateOffsets();
 
-      position += direction * 2;
-      container.style.left = `${position}px`;
-    }, 5); // milliseconds(can adjust for speed)
+        if (position >= maxOffset) {
+            direction = -1;
+        } else if (position <= 0) {
+            direction = 1;
+        }
 
+        position += direction * 2;
+        container.style.left = `${position}px`;
+    }, 5); // milliseconds (can adjust for speed)
 };
 
 const promptAndStart = () => {
-  const size = parseInt(prompt(`Enter the size of your diamond as a number:`), 10);
+    const size = parseInt(prompt(`Enter the size of your diamond as a number:`), 10);
 
-  if (isNaN(size) || size < 1) {
-    alert(`Please enter a valid number greater than 0`);
-    return;
-  }
+    if (isNaN(size) || size < 1) {
+        alert(`Please enter a valid number greater than 0`);
+        return;
+    }
 
-  createDiamond(size);
-  slideDiamond();
+    createDiamond(size);
+    slideDiamond();
 };
 
 // Run the promptAndStart function directly

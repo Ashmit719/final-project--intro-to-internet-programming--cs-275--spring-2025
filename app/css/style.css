@@ -18,22 +18,22 @@ body {
   background-color: white;
 }
 
-
 .row {
   display: flex;
   justify-content: center;
-  height: 24px;
+  height: 10px;
 }
 
 .space {
   display: inline-block;
-  width: .1px;
+  width: .5px; /* Space between stars */
+  height: 0;
 }
 
 .star {
   display: inline-block;
-  width: 20px;
   text-align: center;
   font-size: 20px;
   color: #3498db;
+  margin-right: 5px; /* Adjust to reduce the space between stars */
 }
