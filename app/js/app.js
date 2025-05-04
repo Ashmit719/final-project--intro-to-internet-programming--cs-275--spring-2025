@@ -87,11 +87,17 @@ const slideDiamond = () => {
 };
 
 const promptAndStart = () => {
-    const size = parseInt(prompt(`Enter the size of your diamond as a number:`), 10);
+    let size;
 
-    if (isNaN(size) || size < 1) {
-        alert(`Please enter a valid number greater than 0`);
-        return;
+    let isValidInput = false;
+    while (!isValidInput) {
+        size = parseInt(prompt(`Enter the size of your diamond as a number:`), 10);
+
+        if (!isNaN(size) && size > 0) {
+            isValidInput = true; // valid input, exit loop
+        } else {
+            alert(`Please enter a valid number greater than 0`);
+        }
     }
 
     createDiamond(size);
