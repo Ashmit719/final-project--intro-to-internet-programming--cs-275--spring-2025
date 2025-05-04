@@ -11,7 +11,6 @@ const eslint = require(`gulp-eslint`);
 const cssnano = require(`cssnano`);
 const postcss = require(`gulp-postcss`);
 const browserSync = require(`browser-sync`).create();
-const plumber = require(`gulp-plumber`);
 
 // Clean 'dev' and 'prod' folders
 const clean = async () => {
@@ -56,7 +55,6 @@ const copyCSSToDev = () => {
 // Transpile JS for development (only Babel, no minification)
 const transpileJSForDev = () => {
     return src(`app/js/**/*.js`)
-        .pipe(plumber())
         .pipe(babel({ presets: [`@babel/preset-env`] }))
         .pipe(dest(`dev/js`));
 };
@@ -78,7 +76,6 @@ const compressCSS = () => {
 // Transpile JS for production (Babel only, no compression yet)
 const transpileJSForProd = () => {
     return src(`app/js/**/*.js`)
-        .pipe(plumber())
         .pipe(babel({ presets: [`@babel/preset-env`] }))
         .pipe(dest(`prod/js`));
 };
